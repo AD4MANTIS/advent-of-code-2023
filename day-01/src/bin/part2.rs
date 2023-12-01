@@ -8,13 +8,15 @@ fn part2(input: &str) -> u32 {
     input
         .lines()
         .filter_map(|line| {
-            let numbers = replace_text_with_number(line.to_string());
+            let numbers = replace_text_with_number(line);
 
-            let number_raw = match numbers.len() {
-                1 => format!("{0}{0}", numbers[0]),
-                2.. => format!("{}{}", numbers[0], numbers.last().unwrap()),
-                _ => panic!(),
-            };
+            let number_raw = format!(
+                "{}{}",
+                numbers[0],
+                numbers
+                    .last()
+                    .expect("line should contain at lease one 'number'")
+            );
 
             number_raw.parse::<u32>().ok()
         })
@@ -51,26 +53,26 @@ fn replace_text_with_number_first_try(mut line: String) -> String {
     line
 }
 
-fn replace_text_with_number(line: String) -> Vec<u32> {
+fn replace_text_with_number(line: &str) -> Vec<u32> {
     (0..line.len())
         .filter_map(|index| {
             if let Ok(number) = line[index..=index].parse::<u32>() {
                 return Some(number);
-            } else {
-                for text_num in [
-                    ("one", 1),
-                    ("two", 2),
-                    ("three", 3),
-                    ("four", 4),
-                    ("five", 5),
-                    ("six", 6),
-                    ("seven", 7),
-                    ("eight", 8),
-                    ("nine", 9),
-                ] {
-                    if line[index..line.len()].starts_with(text_num.0) {
-                        return Some(text_num.1);
-                    }
+            }
+
+            for text_num in [
+                ("one", 1),
+                ("two", 2),
+                ("three", 3),
+                ("four", 4),
+                ("five", 5),
+                ("six", 6),
+                ("seven", 7),
+                ("eight", 8),
+                ("nine", 9),
+            ] {
+                if line[index..line.len()].starts_with(text_num.0) {
+                    return Some(text_num.1);
                 }
             }
 
