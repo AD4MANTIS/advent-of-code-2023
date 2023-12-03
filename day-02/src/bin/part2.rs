@@ -1,26 +1,21 @@
 fn main() {
     let input = include_str!("./input1.txt");
-    let output = part1(input);
+    let output = part2(input);
     dbg!(output);
 }
 
 #[allow(unused_variables)]
-fn part1(input: &str) -> u32 {
+fn part2(input: &str) -> u32 {
     input
         .lines()
         .map(Game::parse)
-        .filter(|game| {
-            // only 12 red cubes, 13 green cubes, and 14 blue cubes?
-            game.draws
-                .iter()
-                .all(|draw| draw.red <= 12 && draw.green <= 13 && draw.blue <= 14)
-        })
-        .map(|game| game.id)
+        .map(|game| game.draws.into_iter().reduce(Draw::max).unwrap().power())
         .sum()
 }
 
 #[derive(Debug)]
 struct Game {
+    #[allow(unused)]
     pub id: u32,
     pub draws: Vec<Draw>,
 }
@@ -71,13 +66,27 @@ struct Draw {
     pub red: u32,
 }
 
+impl Draw {
+    pub fn max(self, other_draw: Draw) -> Draw {
+        Draw {
+            blue: self.blue.max(other_draw.blue),
+            green: self.green.max(other_draw.green),
+            red: self.red.max(other_draw.red),
+        }
+    }
+
+    pub fn power(self) -> u32 {
+        self.red * self.green * self.blue
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn it_works() {
-        let result = part1(include_str!("./test-input1.txt"));
-        assert_eq!(result, 8);
+        let result = part2(include_str!("./test-input1.txt"));
+        assert_eq!(result, 2286);
     }
 }
