@@ -20,23 +20,25 @@ fn part2(input: &str) -> usize {
                 continue;
             }
 
-            let mut adjacent_numbers: Vec<PartNumber> = vec![];
+            let mut adjacent_numbers = Vec::<PartNumber>::new();
 
             for adjacent_pos in iter_adjacent(&Pos {
                 x: current_x,
                 y: current_y,
             }) {
-                if let Some(num) = get_number_from_pos(&map, &adjacent_pos) {
-                    if adjacent_numbers
-                        .iter()
-                        .all(|a| a.start_pos != num.start_pos)
-                    {
-                        adjacent_numbers.push(num);
-                    }
+                let Some(num) = get_number_from_pos(&map, &adjacent_pos) else {
+                    continue;
+                };
+
+                if adjacent_numbers
+                    .iter()
+                    .all(|a| a.start_pos != num.start_pos)
+                {
+                    adjacent_numbers.push(num);
                 }
             }
 
-            if adjacent_numbers.clone().len() == 2 {
+            if adjacent_numbers.len() == 2 {
                 sum += adjacent_numbers[0].number * adjacent_numbers[1].number;
             }
         }
@@ -88,32 +90,34 @@ struct PartNumber {
 }
 
 fn get_number_from_pos(map: &Map, pos: &Pos) -> Option<PartNumber> {
-    let Some(current_char) = map.get_at(pos) else {
-        return None;
-    };
+    let mut pos = pos.clone();
 
-    if !current_char.is_ascii_digit() {
-        return None;
-    }
-
-    let mut pos = Pos {
-        x: pos.x - 1,
-        y: pos.y,
-    };
-
-    while map.get_at(&pos).map(char::is_ascii_digit).unwrap_or(false) {
-        let Some(x) = pos.x.checked_sub(1) else {
-            break;
+    let start_pos = {
+        let Some(current_char) = map.get_at(&pos) else {
+            return None;
         };
 
-        pos.x = x;
-    }
+        if !current_char.is_ascii_digit() {
+            return None;
+        }
+        pos.x -= 1;
 
-    if !map.get_at(&pos).map(char::is_ascii_digit).unwrap_or(false) {
-        pos.x += 1;
-    }
+        loop {
+            if map.get_at(&pos).map(char::is_ascii_digit) != Some(true) {
+                pos.x += 1;
 
-    let start_pos = pos.clone();
+                break;
+            }
+
+            let Some(x) = pos.x.checked_sub(1) else {
+                break;
+            };
+
+            pos.x = x;
+        }
+
+        pos.clone()
+    };
 
     let mut current_number_chars = vec![];
 
@@ -151,8 +155,14 @@ mod tests {
     use super::*;
 
     #[test]
-    fn it_works() {
+    fn test_works() {
         let result = part2(include_str!("./test-input1.txt"));
         assert_eq!(result, 467835);
+    }
+
+    #[test]
+    fn it_works() {
+        let result = part2(include_str!("./input1.txt"));
+        assert_eq!(result, 91031374);
     }
 }
