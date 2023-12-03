@@ -4,7 +4,6 @@ fn main() {
     dbg!(output);
 }
 
-#[allow(unused_variables)]
 fn part1(input: &str) -> u32 {
     let map = input
         .split_inclusive('\n')

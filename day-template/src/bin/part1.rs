@@ -1,5 +1,5 @@
 fn main() {
-    let input = include_str!("./input1.txt");
+    let input = include_str!("./input.txt");
     let output = part1(input);
     dbg!(output);
 }
@@ -15,7 +15,7 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let result = part1(include_str!("./test-input1.txt"));
+        let result = part1(include_str!("./test-input.txt"));
         assert_eq!(result, 4.to_string());
     }
 }
