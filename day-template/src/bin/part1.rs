@@ -1,15 +1,10 @@
-use std::time::SystemTime;
-
 fn main() {
-    let start_time = SystemTime::now();
+    let _timer = lib::PrintTimer::new("");
 
     let input = include_str!("./input.txt");
     let output = part1(input);
 
-    println!(
-        "Output = {output} (Duration: {})",
-        start_time.elapsed().unwrap_or_default().as_secs_f64()
-    );
+    dbg!(output);
 }
 
 #[allow(unused_variables)]

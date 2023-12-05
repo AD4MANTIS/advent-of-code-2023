@@ -1,15 +1,12 @@
-use std::time::SystemTime;
+use rayon::iter::{IntoParallelRefMutIterator, ParallelIterator};
 
 fn main() {
-    let start_time = SystemTime::now();
+    let _timer = lib::PrintTimer::new("");
 
     let input = include_str!("./input.txt");
     let output = part1(input);
 
-    println!(
-        "Output = {output} (Duration: {})",
-        start_time.elapsed().unwrap_or_default().as_secs_f64()
-    );
+    dbg!(output);
 }
 
 #[allow(unused_variables)]
@@ -51,6 +48,8 @@ impl MapLine {
 }
 
 fn parse_map_block(block: &str) -> Vec<MapLine> {
+    dbg!(block.lines().next());
+
     block
         .lines()
         // first line describes what map this is
@@ -73,14 +72,14 @@ fn parse_map_block(block: &str) -> Vec<MapLine> {
 }
 
 fn map_numbers(source_numbers: &mut [usize], lines: &[MapLine]) {
-    for source_number in source_numbers {
+    source_numbers.par_iter_mut().for_each(|source_number| {
         for line in lines {
             if line.contains_source(*source_number) {
                 *source_number = line.map(*source_number);
                 break;
             }
         }
-    }
+    });
 }
 
 #[cfg(test)]
