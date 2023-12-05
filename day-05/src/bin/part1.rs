@@ -1,9 +1,15 @@
-use std::collections::HashMap;
+use std::time::SystemTime;
 
 fn main() {
+    let start_time = SystemTime::now();
+
     let input = include_str!("./input.txt");
     let output = part1(input);
-    dbg!(output);
+
+    println!(
+        "Output = {output} (Duration: {})",
+        start_time.elapsed().unwrap_or_default().as_secs_f64()
+    );
 }
 
 #[allow(unused_variables)]
@@ -19,19 +25,29 @@ fn part1(input: &str) -> usize {
         .collect::<Vec<_>>();
 
     for block in blocks {
-        let map = parse_map_block(block);
-
-        dbg!(seeds.clone());
-
-        for seed in seeds.iter_mut() {
-            *seed = *map.get(seed).unwrap_or(seed);
-        }
+        map_numbers(&mut seeds, &parse_map_block(block));
     }
 
     seeds.iter().min().cloned().unwrap_or_default()
 }
 
-fn parse_map_block(block: &str) -> HashMap<usize, usize> {
+struct MapLine {
+    destination_range_start: usize,
+    source_range_start: usize,
+    range_length: usize,
+}
+
+impl MapLine {
+    pub fn contains_source(&self, source: usize) -> bool {
+        source >= self.source_range_start && source < self.source_range_start + self.range_length
+    }
+
+    pub fn map(&self, source: usize) -> usize {
+        source - self.source_range_start + self.destination_range_start
+    }
+}
+
+fn parse_map_block(block: &str) -> Vec<MapLine> {
     block
         .lines()
         // first line describes what map this is
@@ -41,21 +57,27 @@ fn parse_map_block(block: &str) -> HashMap<usize, usize> {
                 .flat_map(str::parse::<usize>)
                 .collect::<Vec<_>>()
         })
-        .flat_map(|line| {
+        .map(|line| {
             assert_eq!(line.len(), 3);
 
-            let destination_range_start = line[0];
-            let source_range_start = line[1];
-            let range_length = line[2];
-
-            (0..range_length).map(move |number_offset| {
-                dbg!((
-                    source_range_start + number_offset,
-                    destination_range_start + number_offset,
-                ))
-            })
+            MapLine {
+                destination_range_start: line[0],
+                source_range_start: line[1],
+                range_length: line[2],
+            }
         })
         .collect()
+}
+
+fn map_numbers(source_numbers: &mut [usize], lines: &[MapLine]) {
+    for source_number in source_numbers {
+        for line in lines {
+            if line.contains_source(*source_number) {
+                *source_number = line.map(*source_number);
+                break;
+            }
+        }
+    }
 }
 
 #[cfg(test)]
