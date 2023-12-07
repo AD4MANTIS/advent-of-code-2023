@@ -1,5 +1,7 @@
 use std::{cmp::Ordering, collections::HashMap, ops::AddAssign};
 
+use strum::EnumIter;
+
 fn main() {
     let _timer = lib::PrintTimer::new("");
 
@@ -7,12 +9,13 @@ fn main() {
     let output = part1(input);
 
     dbg!(output);
+    assert_eq!(output, 253718286);
 }
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Hash)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, EnumIter, Clone, Copy)]
 enum Card {
-    One = 1,
-    Two,
+    J,
+    Two = 2,
     Three,
     Four,
     Five,
@@ -21,7 +24,6 @@ enum Card {
     Eight,
     Nine,
     Ten,
-    J,
     Q,
     K,
     Ace,
@@ -32,7 +34,6 @@ impl TryFrom<char> for Card {
 
     fn try_from(value: char) -> Result<Self, Self::Error> {
         Ok(match value {
-            '1' => Card::One,
             '2' => Card::Two,
             '3' => Card::Three,
             '4' => Card::Four,
@@ -51,13 +52,13 @@ impl TryFrom<char> for Card {
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 struct Game {
     hand: [Card; 5],
     bid: u32,
 }
 
-#[derive(PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 struct GameScores {
     score: Score,
     game: Game,
@@ -65,17 +66,15 @@ struct GameScores {
 
 impl Ord for GameScores {
     fn cmp(&self, other: &Self) -> Ordering {
-        match self.score.partial_cmp(&other.score) {
-            Some(Ordering::Equal) => {}
-            Some(ord) => return ord,
-            None => {}
+        match self.score.cmp(&other.score) {
+            Ordering::Equal => {}
+            ord => return ord,
         }
 
         for cards in self.game.hand.iter().zip(other.game.hand.iter()) {
-            match cards.0.partial_cmp(cards.1) {
-                Some(Ordering::Equal) => {}
-                Some(ord) => return ord,
-                None => {}
+            match cards.0.cmp(cards.1) {
+                Ordering::Equal => {}
+                ord => return ord,
             }
         }
 
@@ -91,12 +90,14 @@ impl PartialOrd for GameScores {
 
 impl Game {
     pub fn get_score(&self) -> Score {
-        let cards_count = self.hand.iter().fold(HashMap::new(), |mut acc, x| {
-            acc.entry(x).or_insert(0).add_assign(1);
+        let mut cards_count = self.hand.iter().fold(HashMap::new(), |mut acc, x| {
+            acc.entry(*x).or_insert(0).add_assign(1);
             acc
         });
 
-        let max_same = *cards_count.values().max().unwrap_or(&0);
+        let joker_count = cards_count.remove(&Card::J).unwrap_or(0);
+
+        let max_same = *cards_count.values().max().unwrap_or(&0) + joker_count;
 
         match max_same {
             5 => return Score::FiveOfAKind,
@@ -104,12 +105,37 @@ impl Game {
             _ => {}
         }
 
-        if cards_count.len() == 2
-            && cards_count
-                .values()
-                .cloned()
-                .all(|count| count == 2 || count == 3)
-        {
+        let mut used_jokers = 0;
+
+        let mut has_two = false;
+        let mut has_three = false;
+
+        let mut counts = cards_count.values().cloned().collect::<Vec<_>>();
+        counts.sort();
+
+        'outer: for count in counts.iter().rev() {
+            if !has_three {
+                for use_jokers in 0..=(joker_count - used_jokers) {
+                    if *count + use_jokers >= 3 {
+                        has_three = true;
+                        used_jokers += use_jokers;
+                        continue 'outer;
+                    }
+                }
+            }
+
+            if !has_two {
+                for use_jokers in 0..=(joker_count - used_jokers) {
+                    if *count + use_jokers >= 2 {
+                        has_two = true;
+                        used_jokers += use_jokers;
+                        continue 'outer;
+                    }
+                }
+            }
+        }
+
+        if has_two && has_three {
             return Score::FullHouse;
         }
 
@@ -117,10 +143,21 @@ impl Game {
             return Score::ThreeOfAKind;
         }
 
+        used_jokers = 0;
+
         match cards_count
             .values()
-            .cloned()
-            .filter(|count| *count == 2)
+            .copied()
+            .filter(|count| {
+                for use_jokers in 0..=(joker_count - used_jokers) {
+                    if *count + use_jokers >= 2 {
+                        used_jokers += use_jokers;
+                        return true;
+                    }
+                }
+
+                false
+            })
             .count()
         {
             2 => Score::TwoPair,
@@ -130,7 +167,7 @@ impl Game {
     }
 }
 
-#[derive(PartialEq, Eq, PartialOrd)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 enum Score {
     HighCard,
     OnePair,
@@ -141,11 +178,8 @@ enum Score {
     FiveOfAKind,
 }
 
-#[allow(unused_variables)]
 fn part1(input: &str) -> usize {
-    let games = parse_games(input);
-
-    let mut scores = games
+    let mut scores = parse_games(input)
         .into_iter()
         .map(|game| GameScores {
             score: Game::get_score(&game),
@@ -184,8 +218,16 @@ mod tests {
     use super::*;
 
     #[test]
+    fn cmp() {
+        assert!(Card::J < Card::Two);
+        assert!(Card::Two > Card::J);
+        assert!(Card::Ten > Card::J);
+        assert!(Card::Ace > Card::J);
+    }
+
+    #[test]
     fn it_works() {
         let result = part1(include_str!("./test-input.txt"));
-        assert_eq!(result, 6440);
+        assert_eq!(result, 5905);
     }
 }

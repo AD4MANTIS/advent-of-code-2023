@@ -92,7 +92,10 @@ impl PartialOrd for GameScores {
 impl Game {
     pub fn get_score(&self) -> Score {
         let cards_count = self.hand.iter().fold(HashMap::new(), |mut acc, x| {
-            acc.entry(x).or_insert(0).add_assign(1);
+            match x {
+                Card::J => {}
+                _ => acc.entry(x).or_insert(0).add_assign(1),
+            };
             acc
         });
 
