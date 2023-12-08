@@ -97,6 +97,15 @@ name = "day-07"
 version = "0.1.0"
 dependencies = [
  "lib",
+ "strum",
+ "thiserror",
+]
+
+[[package]]
+name = "day-08"
+version = "0.1.0"
+dependencies = [
+ "lib",
  "thiserror",
 ]
 
@@ -105,7 +114,6 @@ name = "day-template"
 version = "0.1.0"
 dependencies = [
  "lib",
- "strum",
  "thiserror",
 ]
 
