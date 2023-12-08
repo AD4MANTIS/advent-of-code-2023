@@ -2,11 +2,20 @@ use std::{cmp::Ordering, collections::HashMap, ops::AddAssign};
 
 use strum::EnumIter;
 
+/*
+    Thanks to this Solution for some mental help: https://github.com/Kezzryn/Advent-of-Code/blob/84c19cf693eff24f312dbb0c84c9df0d017dbede/2023/Day%2007/Program.cs
+
+    I had the following problems:
+    1. `get_score` would return random results because iterating over `cards_count.values()` was in random order and my old algorithm couldn't handle that
+    2. While searching for a `FullHouse` and finding 3 of a kind I first used a normal `break` which only ended the inner loop and continued to use the same cards for the pair.
+      `continue 'outer;` was exactly what I needed here.
+*/
+
 fn main() {
     let _timer = lib::PrintTimer::new("");
 
     let input = include_str!("./input.txt");
-    let output = part1(input);
+    let output = part2(input);
 
     dbg!(output);
     assert_eq!(output, 253718286);
@@ -105,45 +114,44 @@ impl Game {
             _ => {}
         }
 
-        let mut used_jokers = 0;
+        {
+            let mut used_jokers = 0;
 
-        let mut has_two = false;
-        let mut has_three = false;
+            let mut has_two = false;
+            let mut has_three = false;
 
-        let mut counts = cards_count.values().cloned().collect::<Vec<_>>();
-        counts.sort();
+            'outer: for count in cards_count.values() {
+                if !has_three {
+                    for use_jokers in 0..=(joker_count - used_jokers) {
+                        if *count + use_jokers >= 3 {
+                            has_three = true;
+                            used_jokers += use_jokers;
+                            continue 'outer;
+                        }
+                    }
+                }
 
-        'outer: for count in counts.iter().rev() {
-            if !has_three {
-                for use_jokers in 0..=(joker_count - used_jokers) {
-                    if *count + use_jokers >= 3 {
-                        has_three = true;
-                        used_jokers += use_jokers;
-                        continue 'outer;
+                if !has_two {
+                    for use_jokers in 0..=(joker_count - used_jokers) {
+                        if *count + use_jokers >= 2 {
+                            has_two = true;
+                            used_jokers += use_jokers;
+                            continue 'outer;
+                        }
                     }
                 }
             }
 
-            if !has_two {
-                for use_jokers in 0..=(joker_count - used_jokers) {
-                    if *count + use_jokers >= 2 {
-                        has_two = true;
-                        used_jokers += use_jokers;
-                        continue 'outer;
-                    }
-                }
+            if has_two && has_three {
+                return Score::FullHouse;
             }
-        }
-
-        if has_two && has_three {
-            return Score::FullHouse;
         }
 
         if max_same == 3 {
             return Score::ThreeOfAKind;
         }
 
-        used_jokers = 0;
+        let mut used_jokers = 0;
 
         match cards_count
             .values()
@@ -178,7 +186,7 @@ enum Score {
     FiveOfAKind,
 }
 
-fn part1(input: &str) -> usize {
+fn part2(input: &str) -> usize {
     let mut scores = parse_games(input)
         .into_iter()
         .map(|game| GameScores {
@@ -227,7 +235,7 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let result = part1(include_str!("./test-input.txt"));
+        let result = part2(include_str!("./test-input.txt"));
         assert_eq!(result, 5905);
     }
 }
