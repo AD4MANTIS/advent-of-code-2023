@@ -3,8 +3,8 @@ use std::time::SystemTime;
 pub struct PrintTimer(SystemTime, String);
 
 impl PrintTimer {
-    pub fn new(label: &str) -> PrintTimer {
-        PrintTimer(SystemTime::now(), label.to_string())
+    pub fn new(label: &str) -> Self {
+        Self(SystemTime::now(), label.to_string())
     }
 }
 

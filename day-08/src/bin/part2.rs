@@ -6,21 +6,21 @@ fn main() {
     let input = include_str!("./input.txt");
     let output = part2(input);
 
-    dbg!(output);
+    dbg!(output); // 14_935_034_899_483
 }
 
 #[derive(Debug)]
 struct Node {
     name: String,
 
-    childs: Vec<String>,
+    children: Vec<String>,
 }
 
 impl Eq for Node {}
 
 impl PartialEq for Node {
     fn eq(&self, other: &Self) -> bool {
-        self.name == other.name && self.childs == other.childs
+        self.name == other.name && self.children == other.children
     }
 }
 
@@ -33,7 +33,7 @@ impl Hash for Node {
 fn part2(input: &str) -> usize {
     let steps = input.lines().collect::<Vec<_>>()[0].chars().cycle();
 
-    let nodes_with_childs = input
+    let nodes_with_children = input
         .lines()
         .skip(2)
         .map(|line| {
@@ -41,7 +41,7 @@ fn part2(input: &str) -> usize {
             (
                 Node {
                     name: name.to_owned(),
-                    childs: line[(line.find('(').unwrap() + 1)..line.find(')').unwrap()]
+                    children: line[(line.find('(').unwrap() + 1)..line.find(')').unwrap()]
                         .split(", ")
                         .map(str::to_owned)
                         .collect(),
@@ -50,35 +50,46 @@ fn part2(input: &str) -> usize {
             )
         })
         .collect::<HashMap<_, _>>();
-
-    let mut current_node: &Node;
     {
-        let nodes = nodes_with_childs
+        let nodes = nodes_with_children
             .keys()
             .map(|node| (node.name.clone(), node))
             .collect::<HashMap<_, _>>();
 
-        for node in nodes_with_childs.iter() {
-            node.1.borrow_mut().0 = nodes.get(&node.0.childs[0]).copied();
-            node.1.borrow_mut().1 = nodes.get(&node.0.childs[1]).copied();
+        for node in nodes_with_children.iter() {
+            node.1.borrow_mut().0 = nodes.get(&node.0.children[0]).copied();
+            node.1.borrow_mut().1 = nodes.get(&node.0.children[1]).copied();
         }
-
-        current_node = nodes.get("AAA").copied().unwrap();
     }
 
-    let mut step_count = 0;
+    let mut current_nodes = nodes_with_children
+        .keys()
+        .filter(|node| node.name.ends_with('A'))
+        .collect::<Vec<_>>();
+
+    let mut step_count: usize = 0;
     for step in steps {
         step_count += 1;
 
-        let childs = nodes_with_childs.get(current_node).unwrap().borrow();
-        current_node = match step {
-            'L' => childs.0,
-            'R' => childs.1,
-            _ => panic!(),
-        }
-        .unwrap();
+        for current_node in current_nodes.iter_mut() {
+            let children = nodes_with_children
+                .get(current_node)
+                .expect("current node must exist")
+                .borrow();
 
-        if current_node.name == "ZZZ" {
+            *current_node = match step {
+                'L' => children.0,
+                'R' => children.1,
+                _ => panic!("directions need to be 'L' or 'R'"),
+            }
+            .expect("all child nodes should have been set");
+        }
+
+        if step_count % 10_000_000 == 0 {
+            println!("{}M", step_count / 1_000_000);
+        }
+
+        if current_nodes.iter().all(|node| node.name.ends_with('Z')) {
             break;
         }
     }
