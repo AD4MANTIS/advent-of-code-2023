@@ -1,6 +1,8 @@
 use std::{cell::RefCell, collections::HashMap, hash::Hash};
 
+// this algorithm is way to slow to reach the expected answer. It would take more than a month on my machine :(
 // 14_935_034_899_483
+
 lib::day!("08", part2, test => 2);
 
 #[derive(Debug)]

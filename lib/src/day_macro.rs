@@ -32,12 +32,10 @@ macro_rules! day_test {
                 use super::*;
 
                 $(
-                    $crate::paste::item! {
-                        #[test]
-                        fn [< $name _works >]() {
-                            let result = $part(include_str!($crate::get_test_file!($name $(, $test_file)?)));
-                            assert_eq!(result, $result);
-                        }
+                    #[test]
+                    fn [< $name _works >]() {
+                        let result = $part(include_str!($crate::get_test_file!($name $(, $test_file)?)));
+                        assert_eq!(result, $result);
                     }
                 )+
             }
