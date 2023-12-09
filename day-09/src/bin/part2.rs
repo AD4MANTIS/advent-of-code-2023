@@ -4,8 +4,8 @@ lib::day!(
     "09",
     part2,
     test => 2,
-    mixed_numbers("./test-mixed-numbers.txt") => 21164658,
-    neg_numbers("./test-negative-numbers.txt") => -106
+    test_3rd ("./test-part2-3rd.txt") => 5,
+    answer => 1050
 );
 
 #[allow(unused_variables)]
@@ -31,18 +31,13 @@ fn part2(input: &str) -> isize {
 
     for histories in data_histories.iter_mut() {
         for history in (1..histories.len()).rev() {
-            let new_value =
-                histories[history - 1].last().unwrap() + histories[history].last().unwrap();
+            let new_value = histories[history - 1][0] - histories[history][0];
 
-            histories[history - 1].push(new_value);
+            histories[history - 1].insert(0, new_value);
         }
     }
 
-    data_histories
-        .iter()
-        .map(|histories| histories[0].last().unwrap())
-        .cloned()
-        .sum()
+    data_histories.iter().map(|histories| histories[0][0]).sum()
 }
 
 fn get_history_difference(history: &[isize]) -> Vec<isize> {
@@ -52,16 +47,3 @@ fn get_history_difference(history: &[isize]) -> Vec<isize> {
         .map(|pair| pair.1 - pair.0)
         .collect()
 }
-
-// fn get_history_difference_old(history: impl Iterator<Item = isize>) -> Vec<isize> {
-//     let mut differences = Vec::new();
-//     let mut history = history.peekable();
-
-//     while let Some(hist) = history.next() {
-//         if let Some(next) = history.peek() {
-//             differences.push(next - hist);
-//         }
-//     }
-
-//     differences
-// }
