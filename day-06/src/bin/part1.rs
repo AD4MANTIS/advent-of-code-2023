@@ -1,13 +1,5 @@
-fn main() {
-    let _timer = lib::PrintTimer::new("");
+lib::day!("06", part1, test => 288);
 
-    let input = include_str!("./input.txt");
-    let output = part1(input);
-
-    dbg!(output);
-}
-
-#[allow(unused_variables)]
 fn part1(input: &str) -> usize {
     let lines = input
         .lines()
@@ -42,15 +34,4 @@ fn part1(input: &str) -> usize {
     number_of_ways_you_can_beat_the_record_per_game
         .iter()
         .product()
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = part1(include_str!("./test-input.txt"));
-        assert_eq!(result, 288);
-    }
 }

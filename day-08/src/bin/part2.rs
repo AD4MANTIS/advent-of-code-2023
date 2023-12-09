@@ -1,13 +1,7 @@
 use std::{cell::RefCell, collections::HashMap, hash::Hash};
 
-fn main() {
-    let _timer = lib::PrintTimer::new("");
-
-    let input = include_str!("./input.txt");
-    let output = part2(input);
-
-    dbg!(output); // 14_935_034_899_483
-}
+// 14_935_034_899_483
+lib::day!("08", part2, test => 2);
 
 #[derive(Debug)]
 struct Node {
@@ -95,15 +89,4 @@ fn part2(input: &str) -> usize {
     }
 
     step_count
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = part2(include_str!("./test-input-2.txt"));
-        assert_eq!(result, 6);
-    }
 }

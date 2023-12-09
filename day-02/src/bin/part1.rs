@@ -1,8 +1,4 @@
-fn main() {
-    let input = include_str!("./input1.txt");
-    let output = part1(input);
-    dbg!(output);
-}
+lib::day!("02", part1, test => 8);
 
 #[allow(unused_variables)]
 fn part1(input: &str) -> u32 {
@@ -69,15 +65,4 @@ struct Draw {
     pub blue: u32,
     pub green: u32,
     pub red: u32,
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = part1(include_str!("./test-input1.txt"));
-        assert_eq!(result, 8);
-    }
 }

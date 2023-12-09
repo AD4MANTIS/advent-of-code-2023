@@ -1,13 +1,6 @@
 use std::{cmp::Ordering, collections::HashMap, ops::AddAssign};
 
-fn main() {
-    let _timer = lib::PrintTimer::new("");
-
-    let input = include_str!("./input.txt");
-    let output = part1(input);
-
-    dbg!(output);
-}
+lib::day!("07", part1, test => 6440);
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Hash)]
 enum Card {
@@ -180,15 +173,4 @@ fn parse_games(input: &str) -> Vec<Game> {
                 .expect("bid should be a positive number"),
         })
         .collect::<Vec<_>>()
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = part1(include_str!("./test-input.txt"));
-        assert_eq!(result, 6440);
-    }
 }

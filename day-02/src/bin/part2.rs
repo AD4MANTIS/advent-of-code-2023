@@ -1,10 +1,5 @@
-fn main() {
-    let input = include_str!("./input1.txt");
-    let output = part2(input);
-    dbg!(output);
-}
+lib::day!("02", part2, test => 2286);
 
-#[allow(unused_variables)]
 fn part2(input: &str) -> u32 {
     input
         .lines()
@@ -77,16 +72,5 @@ impl Draw {
 
     pub fn power(self) -> u32 {
         self.red * self.green * self.blue
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = part2(include_str!("./test-input1.txt"));
-        assert_eq!(result, 2286);
     }
 }

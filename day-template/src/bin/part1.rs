@@ -1,11 +1,4 @@
-fn main() {
-    let _timer = lib::PrintTimer::new("");
-
-    let input = include_str!("./input.txt");
-    let output = part1(input);
-
-    dbg!(output);
-}
+lib::day!("", part1, test => 0);
 
 #[allow(unused_variables)]
 fn part1(input: &str) -> usize {

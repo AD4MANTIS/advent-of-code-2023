@@ -4,6 +4,7 @@ resolver = "2"
 members = ["day-*"]
 
 [workspace.dependencies]
+lib = { path = "lib" }
 thiserror = "1.0.50"
 
 # Defines a size-optimized profile for the WASM bundle in release mode

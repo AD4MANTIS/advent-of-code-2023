@@ -1,10 +1,6 @@
 use std::char;
 
-fn main() {
-    let input = include_str!("./input1.txt");
-    let output = part2(input);
-    dbg!(output);
-}
+lib::day!("03", part2, test => 467835, answer => 91031374);
 
 fn part2(input: &str) -> usize {
     let map = Map(input
@@ -148,21 +144,4 @@ fn parse_chars_to_usize(chars: &[&char]) -> usize {
         .collect::<String>()
         .parse()
         .expect("should contain only ascii numbers")
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_works() {
-        let result = part2(include_str!("./test-input1.txt"));
-        assert_eq!(result, 467835);
-    }
-
-    #[test]
-    fn it_works() {
-        let result = part2(include_str!("./input1.txt"));
-        assert_eq!(result, 91031374);
-    }
 }

@@ -1,8 +1,4 @@
-fn main() {
-    let input = include_str!("./input1.txt");
-    let output = part1(input);
-    dbg!(output);
-}
+lib::day!("03", part1, test => 4361);
 
 fn part1(input: &str) -> u32 {
     let map = input
@@ -64,15 +60,4 @@ fn check_adjacent(map: &[Vec<char>], current_position_x: usize, current_position
     }
 
     false
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = part1(include_str!("./test-input1.txt"));
-        assert_eq!(result, 4361);
-    }
 }

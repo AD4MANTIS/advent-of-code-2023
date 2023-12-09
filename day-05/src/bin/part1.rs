@@ -1,16 +1,4 @@
-use std::time::SystemTime;
-
-fn main() {
-    let start_time = SystemTime::now();
-
-    let input = include_str!("./input.txt");
-    let output = part1(input);
-
-    println!(
-        "Output = {output} (Duration: {})",
-        start_time.elapsed().unwrap_or_default().as_secs_f64()
-    );
-}
+lib::day!("05", part1, test => 35);
 
 #[allow(unused_variables)]
 fn part1(input: &str) -> usize {
@@ -38,11 +26,11 @@ struct MapLine {
 }
 
 impl MapLine {
-    pub fn contains_source(&self, source: usize) -> bool {
+    pub const fn contains_source(&self, source: usize) -> bool {
         source >= self.source_range_start && source < self.source_range_start + self.range_length
     }
 
-    pub fn map(&self, source: usize) -> usize {
+    pub const fn map(&self, source: usize) -> usize {
         source - self.source_range_start + self.destination_range_start
     }
 }
@@ -77,16 +65,5 @@ fn map_numbers(source_numbers: &mut [usize], lines: &[MapLine]) {
                 break;
             }
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = part1(include_str!("./test-input.txt"));
-        assert_eq!(result, 35);
     }
 }

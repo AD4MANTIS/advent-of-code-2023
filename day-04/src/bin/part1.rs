@@ -1,10 +1,6 @@
 use std::collections::HashSet;
 
-fn main() {
-    let input = include_str!("./input.txt");
-    let output = part1(input);
-    dbg!(output);
-}
+lib::day!("04", part1, test => 13);
 
 #[allow(unused_variables)]
 fn part1(input: &str) -> usize {
@@ -53,16 +49,5 @@ impl Card {
             0 => 0,
             _ => 2_usize.pow((matching_numbers - 1) as u32),
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = part1(include_str!("./test-input.txt"));
-        assert_eq!(result, 13);
     }
 }

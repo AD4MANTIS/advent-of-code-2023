@@ -11,15 +11,7 @@ use strum::EnumIter;
       `continue 'outer;` was exactly what I needed here.
 */
 
-fn main() {
-    let _timer = lib::PrintTimer::new("");
-
-    let input = include_str!("./input.txt");
-    let output = part2(input);
-
-    dbg!(output);
-    assert_eq!(output, 253718286);
-}
+lib::day!("07", part2, test => 5905);
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, EnumIter, Clone, Copy)]
 enum Card {
@@ -43,19 +35,19 @@ impl TryFrom<char> for Card {
 
     fn try_from(value: char) -> Result<Self, Self::Error> {
         Ok(match value {
-            '2' => Card::Two,
-            '3' => Card::Three,
-            '4' => Card::Four,
-            '5' => Card::Five,
-            '6' => Card::Six,
-            '7' => Card::Seven,
-            '8' => Card::Eight,
-            '9' => Card::Nine,
-            'T' => Card::Ten,
-            'J' => Card::J,
-            'Q' => Card::Q,
-            'K' => Card::K,
-            'A' => Card::Ace,
+            '2' => Self::Two,
+            '3' => Self::Three,
+            '4' => Self::Four,
+            '5' => Self::Five,
+            '6' => Self::Six,
+            '7' => Self::Seven,
+            '8' => Self::Eight,
+            '9' => Self::Nine,
+            'T' => Self::Ten,
+            'J' => Self::J,
+            'Q' => Self::Q,
+            'K' => Self::K,
+            'A' => Self::Ace,
             _ => return Err(()),
         })
     }
@@ -222,7 +214,7 @@ fn parse_games(input: &str) -> Vec<Game> {
 }
 
 #[cfg(test)]
-mod tests {
+mod card_compare_tests {
     use super::*;
 
     #[test]
@@ -231,11 +223,5 @@ mod tests {
         assert!(Card::Two > Card::J);
         assert!(Card::Ten > Card::J);
         assert!(Card::Ace > Card::J);
-    }
-
-    #[test]
-    fn it_works() {
-        let result = part2(include_str!("./test-input.txt"));
-        assert_eq!(result, 5905);
     }
 }

@@ -1,16 +1,9 @@
 use rayon::iter::{IntoParallelRefMutIterator, ParallelIterator};
 
-fn main() {
-    let _timer = lib::PrintTimer::new("");
-
-    let input = include_str!("./input.txt");
-    let output = part1(input);
-
-    dbg!(output);
-}
+lib::day!("05", part2, test => 46);
 
 #[allow(unused_variables)]
-fn part1(input: &str) -> usize {
+fn part2(input: &str) -> usize {
     let mut blocks = input.split("\n\n");
 
     let mut seeds = blocks
@@ -80,15 +73,4 @@ fn map_numbers(source_numbers: &mut [usize], lines: &[MapLine]) {
             }
         }
     });
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = part1(include_str!("./test-input.txt"));
-        assert_eq!(result, 46);
-    }
 }

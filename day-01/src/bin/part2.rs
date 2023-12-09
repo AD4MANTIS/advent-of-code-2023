@@ -1,8 +1,4 @@
-fn main() {
-    let input = include_str!("./input1.txt");
-    let output = part2(input);
-    dbg!(output);
-}
+lib::day!("01", part2, test ("test-input-part2.txt") => 281, answer => 54530);
 
 fn part2(input: &str) -> u32 {
     input
@@ -79,30 +75,4 @@ fn replace_text_with_number(line: &str) -> Vec<u32> {
             None
         })
         .collect()
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = part2(
-            r"two1nine
-eightwothree
-abcone2threexyz
-xtwone3four
-4nineeightseven2
-zoneight234
-7pqrstsixteen",
-        );
-        assert_eq!(result, 281);
-    }
-
-    #[test]
-    fn it_works2() {
-        let input = include_str!("./input1.txt");
-        let result = part2(input);
-        assert_eq!(result, 54530);
-    }
 }
