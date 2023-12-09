@@ -1,6 +1,6 @@
 use std::{cell::RefCell, collections::HashMap, hash::Hash};
 
-lib::day!("08", part1, test => 2);
+lib::day!(08, part1, test => 2);
 
 #[derive(Debug)]
 struct Node {

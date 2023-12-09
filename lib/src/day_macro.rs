@@ -5,16 +5,17 @@ Also generates a 1-n test with this format, separated by `,`:<br>
 `(test_name ([raw("test data")] | [("./input-file.txt")]) => expected_result)+`<br>
 For the following `test_name`s the following default `input-file` is assumed, otherwise you have to specify it:<br>
 
-| test_name | input_file      |
-|-----------|-----------------|
-| test      | "test-input.txt"|
-| answer    | "input.txt"     |
+| test_name | input_file          |
+|-----------|---------------------|
+| test      | "test-input.txt"    |
+| example   | "example-input.txt" |
+| answer    | "input.txt"         |
 
 # Examples
 
 ```ignore
 # #[macro_use] extern crate lib;
-lib::day!("09", part2, test => 3, answer => 42);
+lib::day!(09, part2, test => 3, answer => 42);
 ```
 
 <br>
@@ -22,7 +23,7 @@ lib::day!("09", part2, test => 3, answer => 42);
 ```ignore
 # #[macro_use] extern crate lib;
 lib::day!(
-    "09",
+    09,
     part2,
     test raw("3") => 3,
     another_test raw("4 2") => 42
@@ -37,6 +38,7 @@ lib::day!(
 #   input.replace(' ', "").parse().expect("should only contain numbers and space")
 # }
 lib::day_test!(
+    09,
     part2,
     test raw("3") => 3,
     another_test raw("4 2") => 42
@@ -48,7 +50,7 @@ macro_rules! day {
     ($day: literal, $part: expr, $($answers:tt)*) => {
         $crate::day_main!($day, $part);
 
-        $crate::day_test!($part, $($answers)*);
+        $crate::day_test!($day, $part, $($answers)*);
     };
 }
 
@@ -56,7 +58,7 @@ macro_rules! day {
 macro_rules! day_main {
     ($day: literal, $part: expr) => {
         fn main() {
-            let _timer = lib::PrintTimer::new(&$day.to_string());
+            let _timer = lib::PrintTimer::new(&("day-".to_owned() + stringify!($day)));
 
             let input = include_str!("./input.txt");
             let output = $part(input);
@@ -68,6 +70,7 @@ macro_rules! day_main {
 #[macro_export]
 macro_rules! day_test {
     (
+        $day: literal,
         $part: expr,
         $($name: ident $($raw: ident)?$(($test_file: literal))? => $result: literal),+
     ) => {
@@ -78,7 +81,7 @@ macro_rules! day_test {
 
                 $(
                     #[test]
-                    fn [< $name _works >]() {
+                    fn [< day_ $day _ $name _works >]() {
                         let result = $part($crate::get_test_file!($name $($raw)?$( $test_file)?));
                         assert_eq!(result, $result);
                     }
@@ -92,6 +95,9 @@ macro_rules! day_test {
 macro_rules! get_test_file {
     (test) => {
         include_str!("test-input.txt")
+    };
+    (example) => {
+        include_str!("example-input.txt")
     };
     (answer) => {
         include_str!("input.txt")

@@ -1,6 +1,6 @@
 use rayon::iter::{IntoParallelRefMutIterator, ParallelIterator};
 
-lib::day!("05", part2, test => 46);
+lib::day!(05, part2, test => 46);
 
 #[allow(unused_variables)]
 fn part2(input: &str) -> usize {

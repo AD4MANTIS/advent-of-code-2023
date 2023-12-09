@@ -11,7 +11,7 @@ use strum::EnumIter;
       `continue 'outer;` was exactly what I needed here.
 */
 
-lib::day!("07", part2, test => 5905, answer => 253718286);
+lib::day!(07, part2, test => 5905, answer => 253718286);
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, EnumIter, Clone, Copy)]
 enum Card {

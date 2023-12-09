@@ -1,11 +1,12 @@
 use itertools::Itertools;
 
 lib::day!(
-    "09",
+    09,
     part1,
-    test => 114,
-    mixed_numbers("./test-mixed-numbers.txt") => 21164658,
-    neg_numbers("./test-negative-numbers.txt") => -106
+    example => 114,
+    mixed_numbers("./example-mixed-numbers.txt") => 21164658,
+    neg_numbers("./example-negative-numbers.txt") => -106,
+    answer => 1708206096
 );
 
 #[allow(unused_variables)]

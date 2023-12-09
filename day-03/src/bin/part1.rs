@@ -1,4 +1,4 @@
-lib::day!("03", part1, test => 4361);
+lib::day!(03, part1, test => 4361);
 
 fn part1(input: &str) -> u32 {
     let map = input

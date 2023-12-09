@@ -1,6 +1,6 @@
 use std::{cmp::Ordering, collections::HashMap, ops::AddAssign};
 
-lib::day!("07", part1, test => 6440);
+lib::day!(07, part1, test => 6440);
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Hash)]
 enum Card {

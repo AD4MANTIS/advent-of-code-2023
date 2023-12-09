@@ -1,4 +1,4 @@
-lib::day!("02", part2, test => 2286);
+lib::day!(02, part2, test => 2286);
 
 fn part2(input: &str) -> u32 {
     input

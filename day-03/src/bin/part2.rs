@@ -1,6 +1,6 @@
 use std::char;
 
-lib::day!("03", part2, test => 467835, answer => 91031374);
+lib::day!(03, part2, test => 467835, answer => 91031374);
 
 fn part2(input: &str) -> usize {
     let map = Map(input

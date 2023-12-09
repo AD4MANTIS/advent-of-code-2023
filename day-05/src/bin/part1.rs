@@ -1,4 +1,4 @@
-lib::day!("05", part1, test => 35);
+lib::day!(05, part1, test => 35);
 
 #[allow(unused_variables)]
 fn part1(input: &str) -> usize {

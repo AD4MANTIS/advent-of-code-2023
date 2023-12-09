@@ -1,4 +1,4 @@
-lib::day!("01", part2, test ("test-input-part2.txt") => 281, answer => 54530);
+lib::day!(01, part2, test ("test-input-part2.txt") => 281, answer => 54530);
 
 fn part2(input: &str) -> u32 {
     input

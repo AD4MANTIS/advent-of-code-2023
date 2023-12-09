@@ -1,10 +1,10 @@
 use itertools::Itertools;
 
 lib::day!(
-    "09",
+    09,
     part2,
-    test => 2,
-    test_3rd raw("10  13  16  21  30  45") => 5,
+    example => 2,
+    example_3rd raw("10  13  16  21  30  45") => 5,
     answer => 1050
 );
 

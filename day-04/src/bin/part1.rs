@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-lib::day!("04", part1, test => 13);
+lib::day!(04, part1, test => 13);
 
 #[allow(unused_variables)]
 fn part1(input: &str) -> usize {

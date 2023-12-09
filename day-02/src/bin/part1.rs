@@ -1,4 +1,4 @@
-lib::day!("02", part1, test => 8);
+lib::day!(02, part1, test => 8);
 
 #[allow(unused_variables)]
 fn part1(input: &str) -> u32 {

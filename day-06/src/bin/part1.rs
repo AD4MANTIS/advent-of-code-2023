@@ -1,4 +1,4 @@
-lib::day!("06", part1, test => 288);
+lib::day!(06, part1, test => 288);
 
 fn part1(input: &str) -> usize {
     let lines = input
