@@ -1,6 +1,7 @@
 {
     "cSpell.words": [
         "ascii",
-        "Hasher"
+        "Hasher",
+        "peekable"
     ]
 }

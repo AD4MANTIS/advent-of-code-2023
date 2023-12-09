@@ -2,14 +2,14 @@ use itertools::Itertools;
 
 lib::day!(
     "09",
-    part1,
-    test => 114,
+    part2,
+    test => 2,
     mixed_numbers("./test-mixed-numbers.txt") => 21164658,
     neg_numbers("./test-negative-numbers.txt") => -106
 );
 
 #[allow(unused_variables)]
-fn part1(input: &str) -> isize {
+fn part2(input: &str) -> isize {
     let mut data_histories = input
         .lines()
         .map(|line| line.split(' ').flat_map(str::parse::<isize>))
