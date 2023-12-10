@@ -55,7 +55,7 @@ impl Game {
 }
 
 impl Game {
-    pub fn new(id: u32) -> Self {
+    pub const fn new(id: u32) -> Self {
         Self { id, draws: vec![] }
     }
 }

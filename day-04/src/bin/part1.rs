@@ -13,13 +13,13 @@ struct Card {
 }
 
 impl Card {
-    pub fn parse(input: &str) -> Option<Card> {
+    pub fn parse(input: &str) -> Option<Self> {
         let parts: Vec<_> = input
             .split([':', '|'])
             .map(|part| part.split(' ').collect::<Vec<_>>())
             .collect();
 
-        Some(Card {
+        Some(Self {
             winning_numbers: HashSet::from_iter(
                 parts
                     .get(1)?

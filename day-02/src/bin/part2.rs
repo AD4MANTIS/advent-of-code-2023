@@ -49,7 +49,7 @@ impl Game {
 }
 
 impl Game {
-    pub fn new(id: u32) -> Self {
+    pub const fn new(id: u32) -> Self {
         Self { id, draws: vec![] }
     }
 }
@@ -62,15 +62,15 @@ struct Draw {
 }
 
 impl Draw {
-    pub fn max(self, other_draw: Draw) -> Draw {
-        Draw {
+    pub fn max(self, other_draw: Self) -> Self {
+        Self {
             blue: self.blue.max(other_draw.blue),
             green: self.green.max(other_draw.green),
             red: self.red.max(other_draw.red),
         }
     }
 
-    pub fn power(self) -> u32 {
+    pub const fn power(self) -> u32 {
         self.red * self.green * self.blue
     }
 }

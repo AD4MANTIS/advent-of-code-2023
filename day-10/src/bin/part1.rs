@@ -27,6 +27,7 @@ fn part1(input: &str) -> usize {
 
     let start = find_start(&map);
 
+    #[allow(clippy::redundant_clone)]
     let mut last_position = start.clone();
     let mut current_position = find_next_pos_from_start(&map, &start);
 

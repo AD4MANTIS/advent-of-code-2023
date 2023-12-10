@@ -31,11 +31,11 @@ struct MapLine {
 }
 
 impl MapLine {
-    pub fn contains_source(&self, source: usize) -> bool {
+    pub const fn contains_source(&self, source: usize) -> bool {
         source >= self.source_range_start && source < self.source_range_start + self.range_length
     }
 
-    pub fn map(&self, source: usize) -> usize {
+    pub const fn map(&self, source: usize) -> usize {
         source - self.source_range_start + self.destination_range_start
     }
 }
