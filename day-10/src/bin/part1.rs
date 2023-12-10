@@ -33,24 +33,21 @@ fn part1(input: &str) -> usize {
     let mut distance = 0;
 
     while current_position != start {
-        let next_positon = find_next_pos(&map, &last_position, &current_position);
+        let next_position = find_next_pos(&map, &last_position, &current_position);
         last_position = current_position;
-        current_position = next_positon;
+        current_position = next_position;
 
         distance += 1;
     }
 
-    (((distance as f64) / 2.) + 1.) as usize
+    (distance / 2) + (distance % 2)
 }
 
 type Map = [Vec<char>];
 
 fn get_pos(map: &Map, pos: &Pos) -> Option<char> {
-    if let Some(row) = map.get(pos.y) {
-        return row.get(pos.x).cloned();
-    }
-
-    None
+    let row = map.get(pos.y)?;
+    return row.get(pos.x).cloned();
 }
 
 fn find_start(map: &Map) -> Pos {
@@ -93,34 +90,32 @@ fn find_next_pos_from_start(map: &Map, current_pos: &Pos) -> Pos {
         current_pos
     );
 }
+
 fn find_next_pos(map: &Map, last_position: &Pos, current_pos: &Pos) -> Pos {
     let pos = get_pos(map, current_pos).unwrap();
-    if pos != 'S' {
-        return current_pos.clone()
-            + match pos {
-                '|' => (0, current_pos.y as isize - last_position.y as isize),
-                'J' => (
-                    ternary!(current_pos.x == last_position.x => -1, 0),
-                    ternary!(current_pos.y == last_position.y => -1, 0),
-                ),
-                'L' => (
-                    ternary!(current_pos.x == last_position.x => 1, 0),
-                    ternary!(current_pos.y == last_position.y => -1, 0),
-                ),
-                'F' => (
-                    ternary!(current_pos.x == last_position.x => 1, 0),
-                    ternary!(current_pos.y == last_position.y => 1, 0),
-                ),
-                '7' => (
-                    ternary!(current_pos.x == last_position.x => -1, 0),
-                    ternary!(current_pos.y == last_position.y => 1, 0),
-                ),
-                '-' => (current_pos.x as isize - last_position.x as isize, 0),
-                _ => panic!(),
-            };
-    }
 
-    panic!()
+    current_pos.clone()
+        + match pos {
+            '|' => (0, current_pos.y as isize - last_position.y as isize),
+            'J' => (
+                ternary!(current_pos.x == last_position.x => -1, 0),
+                ternary!(current_pos.y == last_position.y => -1, 0),
+            ),
+            'L' => (
+                ternary!(current_pos.x == last_position.x => 1, 0),
+                ternary!(current_pos.y == last_position.y => -1, 0),
+            ),
+            'F' => (
+                ternary!(current_pos.x == last_position.x => 1, 0),
+                ternary!(current_pos.y == last_position.y => 1, 0),
+            ),
+            '7' => (
+                ternary!(current_pos.x == last_position.x => -1, 0),
+                ternary!(current_pos.y == last_position.y => 1, 0),
+            ),
+            '-' => (current_pos.x as isize - last_position.x as isize, 0),
+            _ => panic!(),
+        }
 }
 
 #[macro_export]
