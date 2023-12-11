@@ -1,27 +1,8 @@
 lib::day!(11, part2_1000000, answer => 707505470642);
-// fn main() {}
 
 lib::day_test!(11, part2_2, example => 374);
 lib::day_test!(11, part2_10, example => 1030);
 lib::day_test!(11, part2_100, example => 8410);
-
-// lib::tests! {expansion_tests
-//     init:
-//     use super::*;
-
-//     test:
-//     fn expand_by_10() {
-//         let input = include_str!("./example-input.txt");
-
-//         assert_eq!(part2<10>(input), 1030);
-//     }
-
-//     fn expand_by_100() {
-//         let input = include_str!("./example-input.txt");
-
-//         assert_eq!(part2<100>(input), 8410);
-//     }
-// }
 
 type Image = [Vec<char>];
 
@@ -31,14 +12,17 @@ struct Pos {
     y: usize,
 }
 
+#[allow(dead_code)]
 fn part2_2(input: &str) -> isize {
     part2::<2>(input)
 }
 
+#[allow(dead_code)]
 fn part2_10(input: &str) -> isize {
     part2::<10>(input)
 }
 
+#[allow(dead_code)]
 fn part2_100(input: &str) -> isize {
     part2::<100>(input)
 }
@@ -57,24 +41,19 @@ fn part2<const N: usize>(input: &str) -> isize {
 
     let galaxies = find_galaxies(&expanded_image);
 
-    let mut total_distance = 0;
-    for galaxy_id in 0..galaxies.len() {
-        for next_galaxy_id in (galaxy_id + 1)..galaxies.len() {
-            total_distance += get_distance(&galaxies[galaxy_id], &galaxies[next_galaxy_id])
-        }
-    }
-
-    total_distance
+    (0..galaxies.len())
+        .flat_map(|galaxy_id| {
+            ((galaxy_id + 1)..galaxies.len()).map(move |next_galaxy_id| (galaxy_id, next_galaxy_id))
+        })
+        .map(|galaxy_ids| get_distance(&galaxies[galaxy_ids.0], &galaxies[galaxy_ids.1]))
+        .sum()
 }
 
 fn expand_universe<const FACTOR: usize>(image: &[Vec<char>]) -> Vec<Vec<char>> {
-    let expand_rows = image.iter().enumerate().filter_map(|(id, row)| {
-        if row.iter().all(|space| *space == '.') {
-            Some(id)
-        } else {
-            None
-        }
-    });
+    let expand_rows = image
+        .iter()
+        .enumerate()
+        .filter_map(|(id, row)| row.iter().all(|space| *space == '.').then_some(id));
 
     let columns = image[0].len();
     let expand_columns = (0..columns)
@@ -83,25 +62,17 @@ fn expand_universe<const FACTOR: usize>(image: &[Vec<char>]) -> Vec<Vec<char>> {
 
     let mut expanded = image.to_vec();
 
-    for row in expanded.iter_mut().enumerate() {
-        println!("{}", row.0);
-
+    for row in expanded.iter_mut() {
         for expand_column in expand_columns.iter().rev() {
-            // for _ in 1..FACTOR {
-            row.1
-                .splice(expand_column..=expand_column, ['.'].repeat(FACTOR));
-            // }
+            row.splice(expand_column..=expand_column, (0..FACTOR).map(|_| ' '));
         }
     }
 
-    let a = ['.'].repeat(columns);
-    let b = (0..FACTOR).map(|_| a.clone());
+    // for the distance calculation the row doesn't need to be filled and it can't contain galaxies (#)
+    let new_rows = (0..FACTOR).map(|_| vec![]);
 
-    // let columns = expanded[0].len();
     for expand_row in expand_rows.rev() {
-        // for _ in 1..FACTOR {
-        expanded.splice(expand_row..=expand_row, b.clone());
-        // }
+        expanded.splice(expand_row..=expand_row, new_rows.clone());
     }
 
     expanded
