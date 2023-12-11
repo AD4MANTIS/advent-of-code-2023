@@ -8,7 +8,6 @@ struct Pos {
     y: usize,
 }
 
-#[allow(unused_variables)]
 fn part1(input: &str) -> isize {
     let image = input
         .lines()
