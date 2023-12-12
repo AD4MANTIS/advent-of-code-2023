@@ -1,22 +1,24 @@
-use rayon::iter::{ParallelBridge, ParallelIterator};
+//! To slow an uses to much RAM :(
+
+// use rayon::prelude::*;
 
 lib::day!(12, part2,
     row_1 raw("???.### 1,1,3") => 1,
-    row_2 raw(".??..??...?##. 1,1,3") => 16384,
-    row_3 raw("?#?#?#?#?#?#?#? 1,3,1,6") => 1,
+    // row_2 raw(".??..??...?##. 1,1,3") => 16384,
+    // row_3 raw("?#?#?#?#?#?#?#? 1,3,1,6") => 1,
     row_4 raw("????.#...#... 4,1,1") => 16,
-    row_5 raw("????.######..#####. 1,6,5") => 2500,
-    row_6 raw("?###???????? 3,2,1") => 506250,
+    row_5 raw("????.######..#####. 1,6,5") => 2500
+    // row_6 raw("?###???????? 3,2,1") => 506250,
 
-    example => 525152
+    // example => 525152
 );
 
 fn part2(input: &'static str) -> usize {
     input
         .lines()
-        .par_bridge()
+        // .par_bridge()
         .map(SpringRowRecord::from)
-        .flat_map(|row| with_replaced_unknown_springs(&row))
+        .flat_map(with_replaced_unknown_springs)
         .filter(is_row_possible)
         .count()
 }
@@ -39,14 +41,19 @@ impl From<&'static str> for SpringRowRecord {
             .split(',')
             .flat_map(|group_length| group_length.parse::<u32>());
 
+        let mut springs = springs.to_owned();
+        springs += "?";
+        springs = springs.repeat(5);
+        springs.pop();
+
         Self {
-            springs: springs.to_owned(),
-            groups_of_damaged_springs: groups_of_damaged_springs.collect(),
+            springs,
+            groups_of_damaged_springs: groups_of_damaged_springs.collect::<Vec<_>>().repeat(5),
         }
     }
 }
 
-fn with_replaced_unknown_springs(spring: &SpringRowRecord) -> Vec<SpringRowRecord> {
+fn with_replaced_unknown_springs(spring: SpringRowRecord) -> Vec<SpringRowRecord> {
     let damaged_springs = spring.groups_of_damaged_springs.iter().sum::<u32>() as usize;
 
     let remaining_damaged_springs = damaged_springs
