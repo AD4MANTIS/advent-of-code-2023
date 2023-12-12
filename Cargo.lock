@@ -139,6 +139,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "day-12"
+version = "0.1.0"
+dependencies = [
+ "lib",
+ "thiserror",
+]
+
+[[package]]
 name = "day-template"
 version = "0.1.0"
 dependencies = [
