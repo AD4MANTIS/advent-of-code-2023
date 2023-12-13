@@ -18,7 +18,7 @@ fn part2(input: &str) -> usize {
         .map(|(id, map)| {
             let positions = map.all_pos();
 
-            let initial_reflection_value = dbg!(*get_reflection_value(map).first().unwrap());
+            let initial_reflection_value = *get_reflection_value(map).first().unwrap();
 
             let mut last_pos = None;
             for pos in positions {
@@ -48,7 +48,7 @@ fn get_reflection_value(map: &Map) -> Vec<usize> {
         .iter()
         .map(|x| x + 1)
         .chain(get_horizontal_reflection(map).iter().map(|x| (x + 1) * 100))
-        .collect::<Vec<_>>()
+        .collect()
 }
 
 fn swap_at(map: &mut Map, pos: &Pos) {
@@ -71,6 +71,16 @@ fn get_vertical_reflection(map: &Map) -> Vec<usize> {
     possible_cols
 }
 
+// the iter variant is slower but i will leave it here
+#[allow(unused)]
+fn get_vertical_reflection_iter(map: &Map) -> impl Iterator<Item = usize> + '_ {
+    (0..(map.rows[0].len() - 1)).filter(|possible_col| {
+        map.rows
+            .iter()
+            .all(|row| are_chars_reflected_after_position(possible_col, row))
+    })
+}
+
 fn get_horizontal_reflection(map: &Map) -> Vec<usize> {
     let mut possible_rows = (0..(map.rows.len() - 1)).collect::<Vec<_>>();
 
@@ -81,6 +91,18 @@ fn get_horizontal_reflection(map: &Map) -> Vec<usize> {
     }
 
     possible_rows
+}
+
+#[allow(unused)]
+fn get_horizontal_reflection_iter(map: &Map) -> impl Iterator<Item = usize> + '_ {
+    (0..(map.rows.len() - 1)).filter(|possible_row| {
+        (0..map.rows[0].len()).all(|col_id| {
+            are_chars_reflected_after_position(
+                possible_row,
+                &map.column_iter(col_id).collect::<Vec<_>>(),
+            )
+        })
+    })
 }
 
 fn are_chars_reflected_after_position(reflect_after_pos: &usize, chars: &[char]) -> bool {
