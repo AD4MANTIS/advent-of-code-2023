@@ -2,26 +2,65 @@ use std::str::FromStr;
 
 use lib::map::prelude::*;
 
-lib::day!(00, part2,
-    example => 400
+lib::day!(13, part2,
+    example => 400,
+    answer => 28806
 );
 
 fn part2(input: &str) -> usize {
-    let maps = input
+    let mut maps = input
         .split("\n\n")
         .flat_map(Map::from_str)
         .collect::<Vec<_>>();
 
-    maps.iter()
-        .flat_map(|map| {
-            get_vertical_reflection(map)
-                .map(|x| x + 1)
-                .or_else(|| get_horizontal_reflection(map).map(|x| (x + 1) * 100))
+    maps.iter_mut()
+        .enumerate()
+        .map(|(id, map)| {
+            let positions = map.all_pos();
+
+            let initial_reflection_value = dbg!(*get_reflection_value(map).first().unwrap());
+
+            let mut last_pos = None;
+            for pos in positions {
+                if let Some(last_pos) = last_pos {
+                    swap_at(map, &last_pos);
+                }
+
+                swap_at(map, &pos);
+
+                last_pos = Some(pos);
+
+                if let Some(value) = get_reflection_value(map)
+                    .into_iter()
+                    .find(|value| *value != initial_reflection_value)
+                {
+                    return value;
+                }
+            }
+
+            panic!("{id}");
         })
         .sum()
 }
 
-fn get_vertical_reflection(map: &Map) -> Option<usize> {
+fn get_reflection_value(map: &Map) -> Vec<usize> {
+    get_vertical_reflection(map)
+        .iter()
+        .map(|x| x + 1)
+        .chain(get_horizontal_reflection(map).iter().map(|x| (x + 1) * 100))
+        .collect::<Vec<_>>()
+}
+
+fn swap_at(map: &mut Map, pos: &Pos) {
+    if let Some(elem) = map.get_mut(pos) {
+        *elem = match *elem {
+            '.' => '#',
+            _ => '.',
+        }
+    }
+}
+
+fn get_vertical_reflection(map: &Map) -> Vec<usize> {
     let mut possible_cols = (0..(map.rows[0].len() - 1)).collect::<Vec<_>>();
 
     for row in map.rows.iter() {
@@ -29,10 +68,10 @@ fn get_vertical_reflection(map: &Map) -> Option<usize> {
             .retain(|reflect_after_col| are_chars_reflected_after_position(reflect_after_col, row));
     }
 
-    single(&possible_cols)
+    possible_cols
 }
 
-fn get_horizontal_reflection(map: &Map) -> Option<usize> {
+fn get_horizontal_reflection(map: &Map) -> Vec<usize> {
     let mut possible_rows = (0..(map.rows.len() - 1)).collect::<Vec<_>>();
 
     for col in (0..map.rows[0].len()).map(|col_id| map.column_iter(col_id).collect::<Vec<_>>()) {
@@ -41,24 +80,18 @@ fn get_horizontal_reflection(map: &Map) -> Option<usize> {
         });
     }
 
-    single(&possible_rows)
-}
-
-const fn single<T: Copy>(collection: &[T]) -> Option<T> {
-    match collection.len() == 1 {
-        true => Some(collection[0]),
-        false => None,
-    }
+    possible_rows
 }
 
 fn are_chars_reflected_after_position(reflect_after_pos: &usize, chars: &[char]) -> bool {
-    let mut original_row = *reflect_after_pos;
-    let mut reflected_row = reflect_after_pos + 1;
+    for offset in 0.. {
+        let original = chars.get(reflect_after_pos.checked_sub(offset).unwrap_or(usize::MAX));
+        let reflection = chars.get(reflect_after_pos + offset + 1);
 
-    while chars.get(original_row) == chars.get(reflected_row) {
-        original_row = original_row.checked_sub(1).unwrap_or(usize::MAX);
-        reflected_row += 1;
+        if original != reflection {
+            return original.is_none() || reflection.is_none();
+        }
     }
 
-    chars.get(original_row).is_none() || chars.get(reflected_row).is_none()
+    true
 }

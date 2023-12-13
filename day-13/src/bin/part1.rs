@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use lib::map::prelude::*;
 
-lib::day!(00, part1,
+lib::day!(13, part1,
     a raw(r"##...........
 ..###########
 ##..###..###.

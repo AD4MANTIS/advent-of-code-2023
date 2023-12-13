@@ -12,8 +12,26 @@ impl Map {
         self.rows.get(pos.y)?.get(pos.x)
     }
 
+    pub fn get_mut(&mut self, pos: &Pos) -> Option<&mut char> {
+        self.rows.get_mut(pos.y)?.get_mut(pos.x)
+    }
+
     pub const fn column_iter(&self, col: usize) -> ColumnIter {
         ColumnIter(self, Pos { x: col, y: 0 })
+    }
+
+    pub fn all_pos(&self) -> Vec<Pos> {
+        let mut all_pos = Vec::with_capacity(
+            self.rows.len() * self.rows.get(0).map(|row| row.len()).unwrap_or(0),
+        );
+
+        for row in self.rows.iter().enumerate() {
+            for col in 0..row.1.len() {
+                all_pos.push(Pos { x: col, y: row.0 })
+            }
+        }
+
+        all_pos
     }
 }
 
