@@ -12,7 +12,7 @@ impl Map {
         self.rows.get(pos.y)?.get(pos.x)
     }
 
-    pub const fn column(&self, col: usize) -> ColumnIter {
+    pub const fn column_iter(&self, col: usize) -> ColumnIter {
         ColumnIter(self, Pos { x: col, y: 0 })
     }
 }
@@ -93,7 +93,7 @@ def
     #[test]
     fn column_iterator() {
         let map = &get_test_map();
-        let mut col_iter = map.column(0);
+        let mut col_iter = map.column_iter(0);
 
         assert_eq!(col_iter.next(), Some('1'));
         assert_eq!(col_iter.next(), Some('4'));
@@ -102,7 +102,7 @@ def
         assert_eq!(col_iter.next(), Some('d'));
         assert_eq!(col_iter.next(), None);
 
-        col_iter = map.column(99);
+        col_iter = map.column_iter(99);
         assert_eq!(col_iter.next(), None);
     }
 }
