@@ -9,7 +9,14 @@ pub struct Pos {
 }
 
 impl Pos {
-    pub fn try_add(mut self, rhs: Offset) -> Option<Self> {
+    pub fn try_add(&self, rhs: Offset) -> Option<Self> {
+        Some(Self {
+            x: self.x.checked_add_signed(rhs.x)?,
+            y: self.y.checked_add_signed(rhs.y)?,
+        })
+    }
+
+    pub fn try_add_consuming(mut self, rhs: Offset) -> Option<Self> {
         self.x = self.x.checked_add_signed(rhs.x)?;
         self.y = self.y.checked_add_signed(rhs.y)?;
 
@@ -64,7 +71,7 @@ mod position_tests {
         let pos1 = Pos { x: 1, y: 3 };
         let offset = Offset::new(5, -1);
 
-        let result = pos1.try_add(offset);
+        let result = pos1.try_add_consuming(offset);
 
         assert_eq!(result, Some(Pos { x: 6, y: 2 }));
     }
@@ -77,7 +84,7 @@ mod position_tests {
         };
         let offset = Offset::new(1, 0);
 
-        let result = pos1.try_add(offset);
+        let result = pos1.try_add_consuming(offset);
 
         assert_eq!(
             result,
@@ -96,7 +103,7 @@ mod position_tests {
         };
         let offset = Offset::new(1, 2);
 
-        let result = pos1.try_add(offset);
+        let result = pos1.try_add_consuming(offset);
 
         assert_eq!(result, None);
     }

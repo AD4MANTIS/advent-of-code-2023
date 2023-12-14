@@ -2,18 +2,65 @@ use std::{convert::Infallible, str::FromStr};
 
 use super::prelude::{Offset, Pos};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq)]
 pub struct Map {
     pub rows: Vec<Vec<char>>,
 }
 
+impl std::fmt::Debug for Map {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for row in self.rows.iter() {
+            if f.alternate() {
+                f.write_str(
+                    &(row
+                        .iter()
+                        .map(ToString::to_string)
+                        .collect::<Vec<_>>()
+                        .join(" ")
+                        + "\n"),
+                )?;
+            } else {
+                f.write_fmt(format_args!("{:?}\n", row))?;
+            }
+        }
+
+        Ok(())
+    }
+}
+
 impl Map {
+    pub fn width(&self) -> usize {
+        self.rows[0].len()
+    }
+
+    pub fn height(&self) -> usize {
+        self.rows.len()
+    }
+
     pub fn get(&self, pos: &Pos) -> Option<&char> {
         self.rows.get(pos.y)?.get(pos.x)
     }
 
     pub fn get_mut(&mut self, pos: &Pos) -> Option<&mut char> {
         self.rows.get_mut(pos.y)?.get_mut(pos.x)
+    }
+
+    pub fn swap(&mut self, pos1: &Pos, pos2: &Pos) {
+        let Some(&val1) = self.get(pos1) else {
+            return;
+        };
+
+        let Some(&val2) = self.get(pos2) else {
+            return;
+        };
+
+        *self.get_mut(pos1).unwrap() = val2;
+
+        *self.get_mut(pos2).unwrap() = val1;
+    }
+
+    pub const fn columns(&self) -> ColumnsIter {
+        ColumnsIter(self, 0)
     }
 
     pub const fn column_iter(&self, col: usize) -> ColumnIter {
@@ -35,20 +82,8 @@ impl Map {
     }
 }
 
-impl FromStr for Map {
-    type Err = Infallible;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(Self {
-            rows: s
-                .lines()
-                .map(|line| line.chars().collect::<Vec<_>>())
-                .collect(),
-        })
-    }
-}
-
 pub struct ColumnIter<'a>(&'a Map, Pos);
+pub struct ColumnsIter<'a>(&'a Map, usize);
 
 impl<'a> Iterator for ColumnIter<'a> {
     type Item = char;
@@ -56,9 +91,42 @@ impl<'a> Iterator for ColumnIter<'a> {
     fn next(&mut self) -> Option<Self::Item> {
         let current = self.0.get(&self.1)?;
 
-        self.1 = self.1.clone().try_add(Offset::y(1))?;
+        self.1 = self.1.clone().try_add_consuming(Offset::y(1))?;
 
         Some(*current)
+    }
+}
+
+impl<'a> Iterator for ColumnsIter<'a> {
+    type Item = ColumnIter<'a>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.1 >= self.0.rows.first()?.len() {
+            return None;
+        }
+
+        self.1 += 1;
+
+        Some(self.0.column_iter(self.1 - 1))
+    }
+}
+
+impl FromStr for Map {
+    type Err = Infallible;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(s.into())
+    }
+}
+
+impl From<&str> for Map {
+    fn from(value: &str) -> Self {
+        Self {
+            rows: value
+                .lines()
+                .map(|line| line.chars().collect::<Vec<_>>())
+                .collect(),
+        }
     }
 }
 

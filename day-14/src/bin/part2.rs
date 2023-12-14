@@ -1,6 +1,6 @@
 use lib::map::prelude::*;
 
-lib::day!(14, part1, example => 136, answer => 113456);
+lib::day!(14, part1, example => 64);
 
 const ROUND_ROCK: char = 'O';
 #[allow(unused)]
