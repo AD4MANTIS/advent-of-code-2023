@@ -9,6 +9,10 @@ lib = { path = "lib" }
 thiserror = "1.0.50"
 itertools = "0.12.0"
 
+[profile.release-with-symbols]
+inherits = "release"
+debug = true
+
 # Defines a size-optimized profile for the WASM bundle in release mode
 [profile.wasm-release]
 inherits = "release"

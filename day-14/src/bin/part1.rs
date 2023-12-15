@@ -17,7 +17,7 @@ fn part1(input: &str) -> usize {
 
         let mut current_pos = pos.clone();
 
-        while let Some(next_pos) = current_pos.try_add(Offset::y(-1)) {
+        while let Some(next_pos) = current_pos.try_add(&Offset::y(-1)) {
             if map.get(&next_pos) != Some(&EMPTY) {
                 break;
             }

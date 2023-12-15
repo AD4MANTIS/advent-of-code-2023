@@ -22,6 +22,7 @@
 				"--workspace",
 				"--exclude",
 				"day-template",
+				"--release",
 				"--no-fail-fast"
 			],
 			"problemMatcher": [

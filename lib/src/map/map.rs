@@ -1,10 +1,19 @@
-use std::{convert::Infallible, str::FromStr};
+use std::{convert::Infallible, ops::Index, str::FromStr};
 
 use super::prelude::{Offset, Pos};
 
 #[derive(Clone, PartialEq, Eq)]
 pub struct Map {
     pub rows: Vec<Vec<char>>,
+}
+
+impl Index<&Pos> for Map {
+    type Output = char;
+
+    #[inline(always)]
+    fn index(&self, pos: &Pos) -> &Self::Output {
+        &self.rows[pos.y][pos.x]
+    }
 }
 
 impl std::fmt::Debug for Map {
@@ -131,20 +140,21 @@ impl From<&str> for Map {
 }
 
 #[cfg(test)]
+pub(super) fn get_test_map() -> Map {
+    Map {
+        rows: vec![
+            vec!['1', '2', '3'],
+            vec!['4', '5', '6'],
+            vec!['7', '8', '9'],
+            vec!['a', 'b', 'c'],
+            vec!['d', 'e', 'f'],
+        ],
+    }
+}
+
+#[cfg(test)]
 mod map_tests {
     use super::*;
-
-    fn get_test_map() -> Map {
-        Map {
-            rows: vec![
-                vec!['1', '2', '3'],
-                vec!['4', '5', '6'],
-                vec!['7', '8', '9'],
-                vec!['a', 'b', 'c'],
-                vec!['d', 'e', 'f'],
-            ],
-        }
-    }
 
     #[test]
     fn create_map() {
@@ -174,6 +184,32 @@ def
         assert_eq!(map.get(&Pos { x: 2, y: 4 }), Some(&'f'));
         assert_eq!(map.get(&Pos { x: 3, y: 0 }), None);
         assert_eq!(map.get(&Pos { x: 2, y: 5 }), None);
+    }
+
+    #[test]
+    fn get_all_pos() {
+        let map = get_test_map().all_pos();
+
+        assert_eq!(
+            map,
+            vec![
+                Pos { x: 0, y: 0 },
+                Pos { x: 1, y: 0 },
+                Pos { x: 2, y: 0 },
+                Pos { x: 0, y: 1 },
+                Pos { x: 1, y: 1 },
+                Pos { x: 2, y: 1 },
+                Pos { x: 0, y: 2 },
+                Pos { x: 1, y: 2 },
+                Pos { x: 2, y: 2 },
+                Pos { x: 0, y: 3 },
+                Pos { x: 1, y: 3 },
+                Pos { x: 2, y: 3 },
+                Pos { x: 0, y: 4 },
+                Pos { x: 1, y: 4 },
+                Pos { x: 2, y: 4 },
+            ]
+        );
     }
 
     #[test]

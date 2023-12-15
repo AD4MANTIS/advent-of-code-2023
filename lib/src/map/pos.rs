@@ -2,14 +2,14 @@ use std::ops::{Add, AddAssign};
 
 use super::prelude::Offset;
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Pos {
     pub x: usize,
     pub y: usize,
 }
 
 impl Pos {
-    pub fn try_add(&self, rhs: Offset) -> Option<Self> {
+    pub fn try_add(&self, rhs: &Offset) -> Option<Self> {
         Some(Self {
             x: self.x.checked_add_signed(rhs.x)?,
             y: self.y.checked_add_signed(rhs.y)?,
