@@ -2,45 +2,72 @@ use std::collections::{hash_map::RandomState, HashSet};
 
 use lib::map::prelude::*;
 
-lib::day!(16, part2, example => 51);
+lib::day!(16, part2, example => 51, answer => 8489);
 
 fn part2(input: &str) -> usize {
     let map = Map::from(input);
 
-    let mut beams = vec![Beam {
-        pos: Pos::default(),
-        direction: Direction::Right,
-    }];
-    let mut visited_field: HashSet<Beam, RandomState> = HashSet::from_iter(beams.iter().cloned());
+    let start_beams = (0..map.width())
+        .map(|pos| Beam {
+            pos: Pos { y: 0, x: pos },
+            direction: Direction::Bottom,
+        })
+        .chain((0..map.width()).map(|pos| Beam {
+            pos: Pos {
+                y: map.height() - 1,
+                x: pos,
+            },
+            direction: Direction::Top,
+        }))
+        .chain((0..map.height()).map(|pos| Beam {
+            pos: Pos { y: pos, x: 0 },
+            direction: Direction::Right,
+        }))
+        .chain((0..map.height()).map(|pos| Beam {
+            pos: Pos {
+                y: pos,
+                x: map.width() - 1,
+            },
+            direction: Direction::Left,
+        }));
 
-    while !beams.is_empty() {
-        for beam_id in (0..beams.len()).rev() {
-            let beam = beams.get_mut(beam_id).unwrap();
-
-            let result = move_beam(beam, &map);
-
-            if result.beam_ended || visited_field.contains(beam) {
-                beams.remove(beam_id);
-            } else {
-                visited_field.insert(beam.clone());
-            }
-
-            if let Some(new_beam) = result.new_beam {
-                visited_field.insert(new_beam.clone());
-                beams.push(new_beam);
-            }
-        }
-
-        dbg!(&beams);
-    }
-
-    let set = visited_field
+    start_beams
         .into_iter()
-        .map(|field| field.pos)
-        .filter(|pos| pos.y < map.height() && pos.x < map.width())
-        .collect::<HashSet<_>>();
+        .map(|start_beam| {
+            let mut beams = vec![start_beam];
 
-    set.len()
+            let mut visited_field: HashSet<Beam, RandomState> =
+                HashSet::from_iter(beams.iter().cloned());
+
+            while !beams.is_empty() {
+                for beam_id in (0..beams.len()).rev() {
+                    let beam = beams.get_mut(beam_id).unwrap();
+
+                    let result = move_beam(beam, &map);
+
+                    if result.beam_ended || visited_field.contains(beam) {
+                        beams.remove(beam_id);
+                    } else {
+                        visited_field.insert(beam.clone());
+                    }
+
+                    if let Some(new_beam) = result.new_beam {
+                        visited_field.insert(new_beam.clone());
+                        beams.push(new_beam);
+                    }
+                }
+            }
+
+            let set = visited_field
+                .into_iter()
+                .map(|field| field.pos)
+                .filter(|pos| pos.y < map.height() && pos.x < map.width())
+                .collect::<HashSet<_>>();
+
+            set.len()
+        })
+        .max()
+        .unwrap_or_default()
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
