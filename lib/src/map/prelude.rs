@@ -1,1 +1,1 @@
-pub use super::{map::Map, offset::Offset, pos::Pos};
+pub use super::{direction::Direction, map::Map, offset::Offset, pos::Pos};
