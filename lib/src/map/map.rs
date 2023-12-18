@@ -1,14 +1,19 @@
-use std::{convert::Infallible, ops::Index, str::FromStr};
+use std::{
+    convert::Infallible,
+    fmt::{Debug, Display},
+    ops::Index,
+    str::FromStr,
+};
 
 use super::prelude::{Offset, Pos};
 
 #[derive(Clone, PartialEq, Eq)]
-pub struct Map {
-    pub rows: Vec<Vec<char>>,
+pub struct Map<T = char> {
+    pub rows: Vec<Vec<T>>,
 }
 
-impl Index<&Pos> for Map {
-    type Output = char;
+impl<T> Index<&Pos> for Map<T> {
+    type Output = T;
 
     #[inline(always)]
     fn index(&self, pos: &Pos) -> &Self::Output {
@@ -16,7 +21,7 @@ impl Index<&Pos> for Map {
     }
 }
 
-impl std::fmt::Debug for Map {
+impl<T: Display + Debug> std::fmt::Debug for Map<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for row in self.rows.iter() {
             if f.alternate() {
@@ -37,7 +42,7 @@ impl std::fmt::Debug for Map {
     }
 }
 
-impl Map {
+impl<T> Map<T> {
     pub fn width(&self) -> usize {
         self.rows[0].len()
     }
@@ -46,20 +51,22 @@ impl Map {
         self.rows.len()
     }
 
-    pub fn get(&self, pos: &Pos) -> Option<&char> {
+    pub fn get(&self, pos: &Pos) -> Option<&T> {
         self.rows.get(pos.y)?.get(pos.x)
     }
 
-    pub fn get_mut(&mut self, pos: &Pos) -> Option<&mut char> {
+    pub fn get_mut(&mut self, pos: &Pos) -> Option<&mut T> {
         self.rows.get_mut(pos.y)?.get_mut(pos.x)
     }
+}
 
+impl<T: Clone> Map<T> {
     pub fn swap(&mut self, pos1: &Pos, pos2: &Pos) {
-        let Some(&val1) = self.get(pos1) else {
+        let Some(val1) = self.get(pos1).cloned() else {
             return;
         };
 
-        let Some(&val2) = self.get(pos2) else {
+        let Some(val2) = self.get(pos2).cloned() else {
             return;
         };
 
@@ -68,11 +75,11 @@ impl Map {
         *self.get_mut(pos2).unwrap() = val1;
     }
 
-    pub const fn columns(&self) -> ColumnsIter {
+    pub const fn columns(&self) -> ColumnsIter<T> {
         ColumnsIter(self, 0)
     }
 
-    pub const fn column_iter(&self, col: usize) -> ColumnIter {
+    pub const fn column_iter(&self, col: usize) -> ColumnIter<T> {
         ColumnIter(self, Pos { x: col, y: 0 })
     }
 
@@ -91,11 +98,11 @@ impl Map {
     }
 }
 
-pub struct ColumnIter<'a>(&'a Map, Pos);
-pub struct ColumnsIter<'a>(&'a Map, usize);
+pub struct ColumnIter<'a, T>(&'a Map<T>, Pos);
+pub struct ColumnsIter<'a, T>(&'a Map<T>, usize);
 
-impl<'a> Iterator for ColumnIter<'a> {
-    type Item = char;
+impl<'a, T: Copy> Iterator for ColumnIter<'a, T> {
+    type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {
         let current = self.0.get(&self.1)?;
@@ -106,8 +113,8 @@ impl<'a> Iterator for ColumnIter<'a> {
     }
 }
 
-impl<'a> Iterator for ColumnsIter<'a> {
-    type Item = ColumnIter<'a>;
+impl<'a, T: Copy> Iterator for ColumnsIter<'a, T> {
+    type Item = ColumnIter<'a, T>;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.1 >= self.0.rows.first()?.len() {
@@ -120,7 +127,19 @@ impl<'a> Iterator for ColumnsIter<'a> {
     }
 }
 
-impl FromStr for Map {
+impl<T: Default + Clone> Map<T> {
+    pub fn with_size(x: usize, y: usize) -> Self {
+        let row = (0..x).map(|_| T::default()).collect::<Vec<_>>();
+        Self {
+            rows: (0..y).map(|_| row.clone()).collect(),
+        }
+    }
+}
+
+impl<T> FromStr for Map<T>
+where
+    Self: for<'a> From<&'a str>,
+{
     type Err = Infallible;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -128,20 +147,20 @@ impl FromStr for Map {
     }
 }
 
-impl From<&str> for Map {
+impl<T: TryFrom<char>> From<&str> for Map<T> {
     fn from(value: &str) -> Self {
         Self {
             rows: value
                 .lines()
-                .map(|line| line.chars().collect::<Vec<_>>())
+                .map(|line| line.chars().flat_map(T::try_from).collect::<Vec<_>>())
                 .collect(),
         }
     }
 }
 
 #[cfg(test)]
-pub(super) fn get_test_map() -> Map {
-    Map {
+pub(super) fn get_test_map() -> Map<char> {
+    Map::<char> {
         rows: vec![
             vec!['1', '2', '3'],
             vec!['4', '5', '6'],
@@ -158,7 +177,7 @@ mod map_tests {
 
     #[test]
     fn create_map() {
-        let result = Map::from_str(
+        let result = Map::<char>::from_str(
             "\
 123
 456

@@ -1,8 +1,8 @@
-use std::{collections::HashSet, fmt::Display, iter};
+use std::{fmt::Display, iter};
 
 use lib::map::prelude::*;
 
-lib::day!(18, part1, example => 62, answer => 53300);
+lib::day!(18, part1, example => 62);
 
 #[derive(Debug, Clone)]
 pub struct DigInstruction {
@@ -49,6 +49,10 @@ fn part1(input: &str) -> usize {
         })
         .collect::<Vec<_>>();
 
+    #[cfg(test)]
+    const MAP_SIZE: Pos = Pos { x: 10, y: 15 };
+
+    #[cfg(not(test))]
     const MAP_SIZE: Pos = Pos { x: 360, y: 440 };
 
     let mut map = Map {
@@ -58,12 +62,26 @@ fn part1(input: &str) -> usize {
             .collect(),
     };
 
-    const START_POS: Pos = Pos {
+    let mut state_map = Map {
+        rows: iter::once(
+            iter::once(State::Outside)
+                .cycle()
+                .take(MAP_SIZE.x)
+                .collect(),
+        )
+        .cycle()
+        .take(MAP_SIZE.y)
+        .collect(),
+    };
+
+    #[cfg(test)]
+    let mut current_pos = Pos { x: 1, y: 0 };
+
+    #[cfg(not(test))]
+    let mut current_pos = Pos {
         x: 140,
         y: MAP_SIZE.y / 2,
     };
-
-    let mut current_pos = START_POS.clone();
 
     *map.get_mut(&current_pos).unwrap() = Tile::Trench();
 
@@ -80,45 +98,33 @@ fn part1(input: &str) -> usize {
     }
 
     let mut hole_size = 0;
+    for (row_i, row) in map.rows.iter().enumerate() {
+        let mut state = State::Outside;
 
-    let mut inside_positions = std::collections::VecDeque::from([START_POS + Pos { x: 1, y: 1 }]);
-    let mut traversed_positions = HashSet::new();
+        let mut inside_temp_size = 0;
 
-    while let Some(pos) = inside_positions.pop_front() {
-        if traversed_positions.contains(&pos) {
-            continue;
-        }
+        for (tile_i, tile) in row.iter().enumerate() {
+            state.transition(tile);
 
-        let Some(tile) = map.get(&pos) else {
-            continue;
-        };
+            state_map.rows[row_i][tile_i] = state;
 
-        match tile {
-            Tile::Terrain => {
-                hole_size += 1;
+            if !matches!(state, State::Outside) {
+                match state {
+                    State::Outside => todo!(),
 
-                for offset in [
-                    Offset::x(-1),
-                    Offset::x(1),
-                    Offset::y(-1),
-                    Offset::y(1),
-                    Offset { x: -1, y: -1 },
-                    Offset { x: -1, y: 1 },
-                    Offset { x: 1, y: -1 },
-                    Offset { x: 1, y: 1 },
-                ] {
-                    if let Some(next_pos) = pos.try_add(&offset) {
-                        inside_positions.push_back(next_pos);
+                    State::BorderStart => hole_size += 1,
+                    State::Inside => inside_temp_size += 1,
+                    State::BorderEnd => {
+                        hole_size += inside_temp_size + 1;
+                        inside_temp_size = 0;
                     }
                 }
             }
-            Tile::Trench() => {
-                hole_size += 1;
-            }
-        };
-
-        traversed_positions.insert(pos);
+        }
     }
+
+    println!("{:#?}", map);
+    println!("{:#?}", state_map);
 
     hole_size
 }
