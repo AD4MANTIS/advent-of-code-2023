@@ -1,6 +1,7 @@
 use super::prelude::{Map, Pos};
 use std::ops::{Index, IndexMut};
 
+/// Is generally faster than [Map] because you only need to index once
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FlatMap {
     pub width: usize,
