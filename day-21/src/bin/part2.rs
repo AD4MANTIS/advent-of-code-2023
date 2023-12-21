@@ -2,7 +2,7 @@ use ahash::AHashSet;
 
 use lib::map::prelude::*;
 
-lib::day!(21, part1, example => 16, answer => 3716);
+lib::day!(21, part2, example => 16);
 
 const STARTING_POSITION: char = 'S';
 // const GARDEN_PLOTS: char = '.';
@@ -13,7 +13,7 @@ const STEP_COUNT: u32 = 6;
 #[cfg(not(test))]
 const STEP_COUNT: u32 = 64;
 
-fn part1(input: &str) -> usize {
+fn part2(input: &str) -> usize {
     let map = FlatMap::from(Map::from(input));
 
     let start = map
