@@ -76,7 +76,7 @@ macro_rules! day_test {
     ) => {
         #[cfg(test)]
         $crate::paste::item! {
-            mod [< $part _tests >] {
+            mod [< day_ $day _ $part _tests >] {
                 use super::*;
 
                 $(

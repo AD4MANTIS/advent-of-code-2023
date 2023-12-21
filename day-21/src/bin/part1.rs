@@ -2,18 +2,24 @@ use ahash::AHashSet;
 
 use lib::map::prelude::*;
 
-lib::day!(21, part1, example => 16, answer => 3716);
+lib::day!(21, part1, answer => 3716);
+
+lib::day_test!(21, steps_6, example => 16);
+
+#[cfg(test)]
+fn steps_6(input: &str) -> usize {
+    steps::<6>(input)
+}
 
 const STARTING_POSITION: char = 'S';
 // const GARDEN_PLOTS: char = '.';
 const ROCK: char = '#';
 
-#[cfg(test)]
-const STEP_COUNT: u32 = 6;
-#[cfg(not(test))]
-const STEP_COUNT: u32 = 64;
-
 fn part1(input: &str) -> usize {
+    steps::<64>(input)
+}
+
+fn steps<const N: usize>(input: &str) -> usize {
     let map = FlatMap::from(Map::from(input));
 
     let start = map
@@ -28,7 +34,7 @@ fn part1(input: &str) -> usize {
 
     let mut steps = AHashSet::from_iter([start]);
 
-    for s in 0..STEP_COUNT {
+    for _ in 0..N {
         let mut next_steps = Vec::with_capacity(steps.len());
 
         for pos in steps.into_iter() {
@@ -48,8 +54,6 @@ fn part1(input: &str) -> usize {
                 next_steps.push(pos);
             }
         }
-
-        dbg!(s);
 
         steps = next_steps
             .into_iter()
