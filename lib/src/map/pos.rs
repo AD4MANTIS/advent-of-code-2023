@@ -1,6 +1,6 @@
 use std::ops::{Add, AddAssign};
 
-use super::prelude::Offset;
+use super::prelude::{Map, Offset};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Pos {
@@ -21,6 +21,16 @@ impl Pos {
         self.y = self.y.checked_add_signed(rhs.y)?;
 
         Some(self)
+    }
+
+    pub fn try_add_in_map(&self, map: &Map, rhs: &Offset) -> Option<Self> {
+        let pos = self.try_add(rhs)?;
+
+        if pos.x < map.width() && pos.y < map.height() {
+            Some(pos)
+        } else {
+            None
+        }
     }
 }
 

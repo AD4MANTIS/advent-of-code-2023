@@ -96,6 +96,35 @@ impl<T: Clone> Map<T> {
 
         all_pos
     }
+
+    pub const fn all_pos_iter(&self) -> AllPosIter<T> {
+        AllPosIter(self, None)
+    }
+}
+
+pub struct AllPosIter<'a, T>(&'a Map<T>, Option<Pos>);
+
+impl<'a, T> Iterator for AllPosIter<'a, T> {
+    type Item = Pos;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        match &mut self.1 {
+            Some(current_pos) => {
+                current_pos.x += 1;
+                if current_pos.x == self.0.width() {
+                    current_pos.x = 0;
+                    current_pos.y += 1;
+
+                    if current_pos.y == self.0.height() {
+                        return None;
+                    }
+                }
+            }
+            None => self.1 = Some(Pos::default()),
+        };
+
+        self.1.clone()
+    }
 }
 
 pub struct ColumnIter<'a, T>(&'a Map<T>, Pos);
@@ -229,6 +258,20 @@ def
                 Pos { x: 2, y: 4 },
             ]
         );
+    }
+
+    #[test]
+    fn get_all_pos_iter() {
+        let map = get_test_map();
+        let mut pos_iter = map.all_pos_iter();
+
+        assert_eq!(pos_iter.next(), Some(Pos { x: 0, y: 0 }));
+        assert_eq!(pos_iter.next(), Some(Pos { x: 1, y: 0 }));
+        assert_eq!(pos_iter.next(), Some(Pos { x: 2, y: 0 }));
+        assert_eq!(pos_iter.next(), Some(Pos { x: 0, y: 1 }));
+        let mut pos_iter = pos_iter.skip(10);
+        assert_eq!(pos_iter.next(), Some(Pos { x: 2, y: 4 }));
+        assert_eq!(pos_iter.next(), None);
     }
 
     #[test]
