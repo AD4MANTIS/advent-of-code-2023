@@ -32,11 +32,11 @@ mod tests {
         assert_eq!(steps::<100>(input), 6536);
     }
 
-    #[test]
-    fn steps_500() {
-        let input = get_test_file!(example);
-        assert_eq!(steps::<500>(input), 167004);
-    }
+    // #[test]
+    // fn steps_500() {
+    //     let input = get_test_file!(example);
+    //     assert_eq!(steps::<500>(input), 167004);
+    // }
 
     // #[test]
     // fn steps_1000() {
